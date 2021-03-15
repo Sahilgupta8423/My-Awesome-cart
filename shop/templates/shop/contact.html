@@ -1,0 +1,98 @@
+{% extends 'shop/basic.html' %}
+
+{% block title%} Contact Us - My Awesome Cart{% endblock %}
+{% block body %}
+<div class="container my-3">
+    <h3>Contact Us</h3>
+    <form action="/shop/contact/" method="post">{% csrf_token %}
+  <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" class="form-control" required id="name" name='name' placeholder="Enter Your Name">
+  </div>
+  <div class="form-group">
+    <label for="name">Email</label>
+    <input type="email" class="form-control" required id="email" name='email' placeholder="Enter Your Email">
+  </div>
+
+    <div class="form-group">
+    <label for="name">Phone</label>
+    <input type="tel" class="form-control" id="phone"required name='phone' placeholder="Enter Your Phone Number">
+  </div>
+
+
+   <div class="form-group">
+    <label for="desc">How May We Help You?</label>
+    <textarea class="form-control" id="desc" name='desc' rows="3"></textarea>
+  </div>
+        <button type="submit" class="btn btn-success" onclick="myFunction();">Submit</button>
+</form>
+
+
+
+</div>
+{% endblock %}
+{% block js%}
+<script>
+  // Find out the cart items from localStorage
+if (localStorage.getItem('cart') == null) {
+  var cart = {};
+} else {
+  cart = JSON.parse(localStorage.getItem('cart'));
+  var sum = 0;
+  for (var item in cart) {
+
+    sum = sum + cart[item][0];
+  }
+  document.getElementById('cart').innerHTML = sum;
+  updateCart(cart);
+}
+$('#popcart').popover();
+updatePopover(cart);
+function updatePopover(cart) {
+  console.log('We are inside updatePopover');
+  var popStr = "";
+  popStr = popStr + "<h5> Cart for your items in my shopping cart </h5><div class='mx-2 my-2'>";
+  var i = 1;
+  for (var item in cart) {
+      popStr = popStr + "<b>" + i + "</b>. ";
+      popStr = popStr + document.getElementById('name' + item).innerHTML.slice(0, 19) + "... Qty: " + cart[item][0] + '<br>';
+      i = i + 1;
+  }
+  popStr = popStr + "</div> <a href='/shop/checkout'><button class='btn btn-primary' id ='checkout'>Checkout</button></a> <button class='btn btn-primary' onclick='clearCart()' id ='clearCart'>Clear Cart</button>     "
+  console.log(popStr);
+  document.getElementById('popcart').setAttribute('data-content', popStr);
+  $('#popcart').popover('show');
+}
+
+// If the add to cart button is clicked, add/increment the item
+$('.cart').click(function() {
+  var idstr = this.id.toString();
+  if (cart[idstr] != undefined) {
+      cart[idstr] = cart[idstr] + 1;
+  } else {
+      cart[idstr] = 1;
+  }
+  updateCart(cart);
+  
+});
+//Add Popover to cart
+
+function updateCart(cart) {
+  var sum = 0;
+  for (var item in cart) {
+      sum = sum + cart[item];
+      document.getElementById('div' + item).innerHTML = "<button id='minus" + item + "' class='btn btn-primary minus'>-</button> <span id='val" + item + "''>" + cart[item] + "</span> <button id='plus" + item + "' class='btn btn-primary plus'> + </button>";
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  document.getElementById('cart').innerHTML = sum;
+  console.log(cart);
+  updatePopover(cart);
+}
+// If plus or minus button is clicked, change the cart as well as the display value
+
+{% if thank %}
+alert('Thanks for contacting us. We wil get back to you soon!');
+document.location = "/shop/contact";
+{%endif%}
+</script>
+{% endblock %}
